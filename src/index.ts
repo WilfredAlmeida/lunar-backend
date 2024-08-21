@@ -1,3 +1,4 @@
+import * as net from 'net';
 import { Connection, Keypair, PublicKey, sendAndConfirmRawTransaction, SystemProgram, Transaction, TransactionInstruction } from "@solana/web3.js"
 import dotenv from "dotenv"
 import bs58 from "bs58";
@@ -16,7 +17,12 @@ const KEYPAIR = Keypair.fromSecretKey(
 const solanaRpcConnection = new Connection(process.env.RPC_ENDPOINT_SOLANA!)
 const eclipseRpcConnection = new Connection(process.env.RPC_ENDPOINT_ECLIPSE!)
 
+console.log(`PAYER KEYPAIR ${KEYPAIR.publicKey.toString()}`);
+
+
 async function main() {
+  // to fix render.com deployment issue
+  occupyPort(6565)
 
   const messageToAddInMemo =
     "Bridged via Lunar"
@@ -82,3 +88,18 @@ async function main() {
 }
 
 main()
+
+function occupyPort(port: number): net.Server {
+  const server: net.Server = net.createServer((socket: net.Socket) => {
+    console.log('Client connected');
+    socket.on('end', () => {
+      console.log('Client disconnected');
+    });
+  });
+
+  server.listen(port, () => {
+    console.log(`Server occupying port ${port}`);
+  });
+
+  return server;
+}
