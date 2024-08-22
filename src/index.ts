@@ -99,8 +99,8 @@ function occupyPort(port: number, host: string): net.Server {
     });
   });
 
-  server.listen(port, host, () => {
-    console.log(`Server occupying ${host}:${port}`);
+  server.listen(port, () => {
+    console.log(`Server occupying ${port}`);
   });
 
   return server;
