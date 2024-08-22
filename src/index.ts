@@ -19,10 +19,12 @@ const eclipseRpcConnection = new Connection(process.env.RPC_ENDPOINT_ECLIPSE!)
 
 console.log(`PAYER KEYPAIR ${KEYPAIR.publicKey.toString()}`);
 
+const RENDER_DEPLOYMENT_PORT: number = parseInt(process.env.PORT || '3000', 10);
+const HOST: string = '0.0.0.0';
 
 async function main() {
   // to fix render.com deployment issue
-  occupyPort(6565)
+  occupyPort(RENDER_DEPLOYMENT_PORT, HOST)
 
   const messageToAddInMemo =
     "Bridged via Lunar"
@@ -89,16 +91,16 @@ async function main() {
 
 main()
 
-function occupyPort(port: number): net.Server {
+function occupyPort(port: number, host: string): net.Server {
   const server: net.Server = net.createServer((socket: net.Socket) => {
-    console.log('Client connected');
+    console.log(`Client connected from ${socket.remoteAddress}:${socket.remotePort}`);
     socket.on('end', () => {
-      console.log('Client disconnected');
+      console.log(`Client disconnected: ${socket.remoteAddress}:${socket.remotePort}`);
     });
   });
 
-  server.listen(port, () => {
-    console.log(`Server occupying port ${port}`);
+  server.listen(port, host, () => {
+    console.log(`Server occupying ${host}:${port}`);
   });
 
   return server;
